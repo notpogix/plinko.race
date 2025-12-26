@@ -1,378 +1,486 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Marble Maze — Instant Race</title>
-  <style>
-    :root{--bg:#0b1020;--panel:#0f1724;--accent:#6ee7b7;--muted:#94a3b8}
-    html,body{height:100%;margin:0;background:linear-gradient(180deg,#071024 0%, #071a2a 100%);font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
-    .app{display:flex;min-height:100vh;gap:12px;padding:18px}
-    .left{flex:1;min-width:760px;background:transparent;display:flex;flex-direction:column}
-    .topbar{display:flex;gap:10px;align-items:center;margin-bottom:10px}
-    .panel{background:rgba(255,255,255,0.04);border-radius:12px;padding:12px;color:#dfe9f3;box-shadow:0 6px 18px rgba(2,6,23,0.6)}
-    button,select,input[type=text]{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#dfe9f3;padding:8px 10px;border-radius:8px}
-    button.primary{background:linear-gradient(90deg,var(--accent),#60a5fa);color:#041422;border:font-weight:700}
-    #canvasWrap{flex:1;overflow:auto;border-radius:12px}
-    canvas#world{display:block; background: linear-gradient(180deg,#083044 0%, #021019 100%);}
-    .right{width:360px;display:flex;flex-direction:column;gap:12px}
-    .namesList{max-height:260px;overflow:auto;padding:8px}
-    .nameItem{display:flex;align-items:center;gap:10px;padding:8px;border-radius:8px}
-    .ballBadge{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;box-shadow:0 4px 10px rgba(2,6,23,0.6)}
-    .rankBox{position:fixed;right:28px;top:24px;background:rgba(255,255,255,0.03);padding:10px;border-radius:10px;color:#dfe9f3;width:240px}
-    .controls{display:flex;flex-direction:column;gap:8px}
-    .small{font-size:12px;color:var(--muted)}
-    .modeRow{display:flex;gap:8px}
-    .footer{font-size:12px;color:var(--muted);text-align:center;margin-top:8px}
-    .overlay{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:rgba(3,6,15,0.9);padding:18px;border-radius:12px;color:#fff;z-index:60;box-shadow:0 20px 60px rgba(0,0,0,0.6)}
-    .hidden{display:none}
-    .bracket{max-height:300px;overflow:auto;padding:8px}
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Marble Maze Race</title>
+<!-- Matter.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+<style>
+  :root{
+    --bg:#0f1724;
+    --panel:#0b1220cc;
+    --accent:#10b981;
+    --text:#e6eef8;
+  }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;}
+  body{background:linear-gradient(180deg,#071021 0%, #071a2a 100%);color:var(--text);display:flex;flex-direction:column;align-items:center;}
+  header{width:100%;padding:12px 20px;box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  h1{font-size:18px;margin:0;color:var(--accent);}
+  .controls{display:flex;gap:8px;align-items:center;}
+  .panel{background:var(--panel);padding:12px;border-radius:10px;box-shadow:0 6px 18px rgba(2,6,23,0.6);}
+  #ui{position:fixed;right:18px;top:18px;width:220px;z-index:50;}
+  #leaderboard{height:220px;overflow:auto;padding:10px;}
+  label{font-size:12px;color:#9fb6d0;display:block;margin-bottom:6px;}
+  textarea,input,select,button{width:100%;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,0.06);padding:8px;background:transparent;color:var(--text);}
+  button{cursor:pointer;border:none;background:linear-gradient(90deg,#0ea5a4,#06b6d4);color:#021; font-weight:700;padding:10px;}
+  button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--text);font-weight:600;}
+  #canvasWrap{width:100%;max-width:900px;height:1200px;margin:20px auto;border-radius:12px;overflow:hidden;box-shadow:0 10px 40px rgba(2,6,23,0.6);position:relative;}
+  canvas{display:block;background:linear-gradient(180deg,#082033 0%, #04121a 100%);}
+  .finishLine{position:absolute;left:0;right:0;height:6px;background:linear-gradient(90deg,#f97316,#f43f5e);bottom:40px;z-index:40;}
+  .startLine{position:absolute;left:0;right:0;height:6px;background:linear-gradient(90deg,#60a5fa,#7c3aed);top:40px;z-index:40;}
+  .meta{position:fixed;left:18px;top:18px;color:#9fb6d0;font-size:13px;}
+  .small{font-size:12px;color:#9fb6d0;}
+  .nameRow{display:flex;align-items:center;gap:8px;padding:6px;border-radius:6px;margin-bottom:6px;}
+  .colorDot{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;color:#021;}
+  .rankLabel{flex:1;font-weight:700;}
+  footer{width:100%;padding:12px;text-align:center;color:#9fb6d0;font-size:13px;}
+  @media(max-width:720px){
+    #canvasWrap{height:1000px;max-width:420px;}
+    #ui{position:static;margin:12px;}
+    header{flex-direction:column;align-items:flex-start;gap:8px;}
+  }
+</style>
 </head>
 <body>
-  <div class="app">
-    <div class="left">
-      <div class="topbar panel">
-        <div style="display:flex;align-items:center;gap:8px">
-          <strong>Marble Maze — Instant Race</strong>
-          <span class="small">(no login — type names, choose mode & go)</span>
-        </div>
-
-        <div style="margin-left:12px;display:flex;gap:8px;align-items:center">
-          <select id="modeSelect" title="Game mode">
-            <option value="winner">Winner Selection</option>
-            <option value="elimination">Elimination (Last Out)</option>
-          </select>
-          <button id="startBtn" class="primary">Start Race</button>
-          <button id="stopBtn">Stop</button>
-          <button id="shuffleBtn">Shuffle Maze</button>
-          <label class="small">Gravity <input id="gravity" type="range" min="0.2" max="2.5" step="0.05" value="1"></label>
-          <label class="small">TimeScale <input id="timescale" type="range" min="0.3" max="1.6" step="0.05" value="1"></label>
-        </div>
+<header>
+  <h1>Marble Maze Race</h1>
+  <div class="controls">
+    <div class="panel" style="min-width:260px;">
+      <label>Enter names (one per line)</label>
+      <textarea id="namesInput" rows="4" placeholder="Alice&#10;Bob&#10;Charlie"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <select id="modeSelect" title="Mode">
+          <option value="remove">Remove Winner (keep playing)</option>
+          <option value="elimination">Elimination (last out each round)</option>
+        </select>
+        <button id="startBtn">Start Race</button>
       </div>
-
-      <div id="canvasWrap" class="panel">
-        <!-- Large scrollable map; canvas inside -->
-        <canvas id="world" width="900" height="2000"></canvas>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button id="continueBtn" class="secondary">Continue</button>
+        <button id="removeWinnerBtn" class="secondary">Remove Winner</button>
+        <button id="resetBtn" class="secondary">Reset</button>
       </div>
-
-      <div class="panel" style="margin-top:10px;display:flex;justify-content:space-between;align-items:center">
-        <div class="small">Each round attempts to be ~60s by default — you can change gravity and timescale.</div>
-        <div>
-          <label class="small">Bracket View <input type="checkbox" id="bracketToggle"></label>
-        </div>
-      </div>
-    </div>
-
-    <div class="right">
-      <div class="panel controls">
-        <div style="display:flex;gap:8px">
-          <input id="nameInput" type="text" placeholder="Type a name and press Enter" />
-          <button id="addBtn">Add</button>
-        </div>
-        <div class="small">Players (drag to reorder)</div>
-        <div id="players" class="namesList"></div>
-        <div style="display:flex;gap:8px">
-          <button id="clearBtn">Clear</button>
-          <button id="randomBtn">Add 6 Random</button>
-        </div>
-        <div class="small">Options</div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <label><input type="checkbox" id="autoContinue" checked> Auto-continue rounds (keep playing till all winners removed)</label>
-          <label><input type="checkbox" id="shuffleEachRound"> Shuffle maze each round</label>
-          <label><input type="checkbox" id="keepMapLarge" checked> Large map (long races)</label>
-        </div>
-      </div>
-
-      <div class="panel" id="rankPanel">
-        <strong>Live Rankings</strong>
-        <div id="ranks" style="margin-top:8px"></div>
-      </div>
-
-      <div class="panel bracket hidden" id="bracketPanel">
-        <strong>Bracket / Tournament</strong>
-        <div id="bracketArea"></div>
-      </div>
-
-      <div class="panel">
-        <strong>Last Result</strong>
-        <div id="lastResult" style="margin-top:8px" class="small">—</div>
-        <div style="margin-top:8px;display:flex;gap:8px">
-          <button id="removeWinnerBtn" class="hidden">Remove Winner & Continue</button>
-          <button id="restartBtn">Restart Race</button>
-          <button id="exportBtn">Export Players</button>
-        </div>
-      </div>
-
-      <div class="footer panel small">Tip: Scroll the map vertically to see full course. Use shuffle + bracket mode for tournaments.</div>
+      <div style="margin-top:8px;" class="small">Tip: Add many names for a longer, more chaotic race.</div>
     </div>
   </div>
+</header>
 
-  <div id="winnerOverlay" class="overlay hidden"></div>
+<div id="canvasWrap" class="panel">
+  <div class="startLine"></div>
+  <div class="finishLine"></div>
+  <canvas id="world"></canvas>
+</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
-  <script>
-  // Marble Maze — Single-file implementation using Matter.js
-  // Features implemented based on your spec:
-  // - vertical layout, large map, scrollable
-  // - mode selection (winner selection / elimination)
-  // - add names (press Enter or Add button)
-  // - unique color and letter badge, 3D-like shading, physics collisions
-  // - shuffle maze, gravity slider, timescale, bracket/view
-  // - live ranking by distance to finish, elimination/winner handling
+<div id="ui">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <strong>Leaderboard</strong>
+      <span id="roundInfo" class="small">Round 0</span>
+    </div>
+    <div id="leaderboard"></div>
+    <div style="margin-top:8px;">
+      <div class="small">Round timer: <span id="timer">00:00</span></div>
+      <div class="small">Active balls: <span id="activeCount">0</span></div>
+    </div>
+  </div>
+</div>
 
-  const { Engine, Render, World, Bodies, Body, Events, Runner, Composite, Composites, Constraint } = Matter;
+<div class="meta panel">
+  <div><strong>Mode:</strong> <span id="modeLabel">Remove Winner</span></div>
+  <div class="small">Start at top, finish at bottom</div>
+</div>
 
-  // DOM hooks
-  const canvas = document.getElementById('world');
-  const ctx = canvas.getContext('2d');
-  const playersDiv = document.getElementById('players');
-  const ranksDiv = document.getElementById('ranks');
-  const startBtn = document.getElementById('startBtn');
-  const stopBtn = document.getElementById('stopBtn');
-  const addBtn = document.getElementById('addBtn');
-  const nameInput = document.getElementById('nameInput');
-  const clearBtn = document.getElementById('clearBtn');
-  const randomBtn = document.getElementById('randomBtn');
-  const modeSelect = document.getElementById('modeSelect');
-  const shuffleBtn = document.getElementById('shuffleBtn');
-  const gravityRange = document.getElementById('gravity');
-  const timescaleRange = document.getElementById('timescale');
-  const winnerOverlay = document.getElementById('winnerOverlay');
-  const removeWinnerBtn = document.getElementById('removeWinnerBtn');
-  const lastResult = document.getElementById('lastResult');
-  const restartBtn = document.getElementById('restartBtn');
-  const exportBtn = document.getElementById('exportBtn');
-  const bracketToggle = document.getElementById('bracketToggle');
-  const bracketPanel = document.getElementById('bracketPanel');
-  const bracketArea = document.getElementById('bracketArea');
+<footer class="panel small">No login required — enter names and start. Physics powered by Matter.js</footer>
 
-  // World settings
-  let canvasWidth = canvas.width = 900;
-  let canvasHeight = canvas.height = (document.getElementById('canvasWrap').clientHeight>0? 2000 : 2000); // large vertical world
-  let finishY = canvasHeight - 80;
-  const startY = 80;
-  let engine = Engine.create();
-  let runner = null;
-  let worldBodies = [];
+<script>
+/* Marble Maze Race
+   Single-file site using Matter.js
+   Paste into index.html and open in browser.
+*/
 
-  engine.world.gravity.y = parseFloat(gravityRange.value);
-  engine.timing.timeScale = parseFloat(timescaleRange.value);
+// ----- Utilities -----
+const COLORS = [
+  '#F97316','#F43F5E','#FB7185','#60A5FA','#7C3AED','#34D399','#F59E0B','#06B6D4','#EF4444','#A78BFA',
+  '#FDE68A','#34D399','#60A5FA','#F472B6','#FCA5A5','#93C5FD','#C7B3FF'
+];
+function pickColor(i){ return COLORS[i % COLORS.length]; }
+function letterOf(name){ return (name||'').trim().charAt(0).toUpperCase() || '?'; }
+function formatTime(s){ const m=Math.floor(s/60), sec=Math.floor(s%60); return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`; }
 
-  // State
-  let players = []; // {id,name,color,letter,body,finishedAt,rank}
-  let balls = [];
-  let pegs = [];
-  let obstacles = [];
-  let finishOrder = [];
-  let running = false;
-  let roundCount = 0;
-  let eliminationOrder = [];
+// ----- Matter.js setup -----
+const { Engine, Render, Runner, Bodies, Composite, Composites, Body, Events, Mouse, MouseConstraint, Vector } = Matter;
 
-  // Utilities
-  function uid(prefix='p'){return prefix + Math.random().toString(36).slice(2,9)}
-  function pickColor(seed){ // deterministic-ish color from seed
-    let h = Math.abs(hashCode(seed)) % 360; return `hsl(${h} 70% 55%)`;
+const canvas = document.getElementById('world');
+const canvasWrap = document.getElementById('canvasWrap');
+const W = canvasWrap.clientWidth;
+const H = canvasWrap.clientHeight;
+canvas.width = W;
+canvas.height = H;
+
+const engine = Engine.create();
+engine.gravity.y = 1.05; // adjustable for pacing
+const world = engine.world;
+world.bounds = { min: { x: 0, y: 0 }, max: { x: W, y: H } };
+
+const render = Render.create({
+  canvas: canvas,
+  engine: engine,
+  options: {
+    width: W,
+    height: H,
+    wireframes: false,
+    background: 'transparent',
+    showAngleIndicator: false
   }
-  function hashCode(s){let h=0; for(let i=0;i<s.length;i++)h=(h<<5)-h+s.charCodeAt(i)|0; return h}
+});
+Render.run(render);
+const runner = Runner.create();
+Runner.run(runner, engine);
 
-  // UI: add player
-  function addPlayer(name){ if(!name) return; name = name.trim(); if(!name) return;
-    const id = uid('pl_');
-    const letter = name[0].toUpperCase();
-    const color = pickColor(name + Math.random()); // use random part to avoid identical colors for same name
-    const player = {id, name, color, letter, body:null, finishedAt:null, rank:null};
-    players.push(player); renderPlayers();
-  }
-  function renderPlayers(){ playersDiv.innerHTML=''; players.forEach((p,i)=>{
-      const el = document.createElement('div'); el.className='nameItem'; el.draggable=true;
-      el.innerHTML = `<div class="ballBadge" style="background:${p.color};color:#021022">${p.letter}</div><div style="flex:1"><strong>${p.name}</strong><div class="small">#${i+1}</div></div><button data-id="${p.id}">✖</button>`;
-      playersDiv.appendChild(el);
-      el.querySelector('button').onclick = ()=>{ players = players.filter(x=>x.id!==p.id); renderPlayers(); }
+// ----- Static walls -----
+const wallThickness = 60;
+const walls = [
+  Bodies.rectangle(W/2, -wallThickness/2, W, wallThickness, { isStatic:true }),
+  Bodies.rectangle(W/2, H + wallThickness/2, W, wallThickness, { isStatic:true }),
+  Bodies.rectangle(-wallThickness/2, H/2, wallThickness, H, { isStatic:true }),
+  Bodies.rectangle(W + wallThickness/2, H/2, wallThickness, H, { isStatic:true })
+];
+Composite.add(world, walls);
 
-      // reorder by drag
-      el.addEventListener('dragstart', e=>{ e.dataTransfer.setData('text/plain', p.id) })
-      el.addEventListener('dragover', e=>{ e.preventDefault() })
-      el.addEventListener('drop', e=>{ e.preventDefault(); const from = e.dataTransfer.getData('text'); const to = p.id; reorderPlayers(from,to); })
-    })}
+// Finish line sensor (y coordinate)
+const finishY = H - 60;
 
-  function reorderPlayers(fromId,toId){ const fromIdx = players.findIndex(x=>x.id===fromId); const toIdx = players.findIndex(x=>x.id===toId); if(fromIdx<0||toIdx<0) return; const [item]=players.splice(fromIdx,1); players.splice(toIdx,0,item); renderPlayers(); }
-
-  nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ addPlayer(nameInput.value); nameInput.value=''; } })
-  addBtn.onclick = ()=>{ addPlayer(nameInput.value); nameInput.value=''; }
-  clearBtn.onclick = ()=>{ players=[]; renderPlayers(); }
-  randomBtn.onclick = ()=>{ const sample = ['Ava','Liam','Noah','Mia','Zoe','Kai','Rin','Omar','Nia','Leo','Isha','Raj']; for(let i=0;i<6;i++){ addPlayer(sample[Math.floor(Math.random()*sample.length)] + (Math.random()>0.5?'':' '+Math.floor(Math.random()*99))); } }
-
-  // Maze generator (pegs) — plinko-style pegs
-  function generatePegs(){ // clear existing
-    pegs.forEach(b=>World.remove(engine.world,b)); pegs=[];
-    const cols = 9; const spacingX = canvasWidth / cols; const spacingY = 90; let offset=0;
-    for(let y=startY+60;y<finishY-140;y+=spacingY){
-      offset = (offset===0? spacingX/2 : 0);
-      for(let x=offset+40;x<canvasWidth-40;x+=spacingX){
-        if(Math.random() < 0.85){ const r=8 + Math.random()*4; const peg = Bodies.circle(x + (Math.random()*18-9), y + (Math.random()*12-6), r, {isStatic:true,friction:0,render:{visible:false}}); pegs.push(peg); }
-      }
+// ----- Peg / maze generator -----
+function generatePegs(rows=18, cols=10, spacingX= W / (cols+1), spacingY = (H-160)/rows) {
+  const pegs = [];
+  const startY = 120;
+  for (let r=0;r<rows;r++){
+    const offset = (r % 2 === 0) ? spacingX/2 : 0;
+    for (let c=0;c<cols;c++){
+      const x = Math.max(40, Math.min(W-40, (c+1)*spacingX + offset));
+      const y = startY + r*spacingY + (Math.random()*spacingY*0.25);
+      const peg = Bodies.circle(x, y, 8 + Math.random()*6, {
+        isStatic: true,
+        render: { fillStyle: '#94a3b8' }
+      });
+      pegs.push(peg);
     }
-    pegs.forEach(p=>World.add(engine.world,p));
   }
+  return pegs;
+}
+let pegs = generatePegs(22, 12); // dense, long map
+Composite.add(world, pegs);
 
-  function addBorders(){ const thickness = 40; const left = Bodies.rectangle(-thickness/2, canvasHeight/2, thickness, canvasHeight, {isStatic:true}); const right = Bodies.rectangle(canvasWidth+thickness/2, canvasHeight/2, thickness, canvasHeight, {isStatic:true}); const top = Bodies.rectangle(canvasWidth/2, -thickness/2, canvasWidth, thickness, {isStatic:true}); const finish = Bodies.rectangle(canvasWidth/2, finishY+20, canvasWidth, 40, {isStatic:true, isSensor:true, label:'finish'});
-    World.add(engine.world,[left,right,top,finish]); obstacles.push(left,right,top,finish);
-  }
+// Add some angled obstacles / ramps
+function addRamps(){
+  const ramps = [];
+  ramps.push(Bodies.rectangle(W*0.25, H*0.45, W*0.5, 12, { isStatic:true, angle: -0.25, render:{fillStyle:'#334155'} }));
+  ramps.push(Bodies.rectangle(W*0.75, H*0.65, W*0.5, 12, { isStatic:true, angle: 0.18, render:{fillStyle:'#334155'} }));
+  Composite.add(world, ramps);
+}
+addRamps();
 
-  function clearWorld(){ World.clear(engine.world); pegs=[]; obstacles=[]; balls=[]; finishOrder=[]; }
+// ----- Ball management -----
+let balls = []; // { body, name, color, letter, finishedAt, id }
+let nextBallId = 1;
+const ballRadius = 18;
+const startXRange = [60, W-60];
+const startY = 60;
 
-  function spawnBalls(){ // spawn at top spaced horizontally
-    const count = players.length; const gap = Math.min(72, (canvasWidth-200)/Math.max(1,count)); const startX = (canvasWidth - (count-1)*gap)/2;
-    players.forEach((p,i)=>{
-      const x = startX + i*gap + (Math.random()*14-7); const y = startY - (10 + Math.random()*10);
-      const radius = 20; const body = Bodies.circle(x, y, radius, { restitution:0.2, friction:0.02, frictionAir:0.02, density:0.002, label:'player' });
-      body.plugin = {playerId:p.id}; p.body = body; p.finishedAt = null; p.rank = null; World.add(engine.world, body); balls.push({player:p, body, radius});
-    });
-  }
+function createBall(name, color){
+  const x = startXRange[0] + Math.random()*(startXRange[1]-startXRange[0]);
+  const body = Bodies.circle(x, startY + Math.random()*6, ballRadius, {
+    restitution: 0.3,
+    friction: 0.02,
+    frictionAir: 0.002,
+    density: 0.002,
+    label: 'ball',
+    render: { fillStyle: color }
+  });
+  body.customId = nextBallId++;
+  const b = { body, name, color, letter: letterOf(name), finishedAt: null, id: body.customId };
+  balls.push(b);
+  Composite.add(world, body);
+  return b;
+}
 
-  function drawScene(){ ctx.clearRect(0,0,canvasWidth,canvasHeight);
-    // background gradient
-    const g = ctx.createLinearGradient(0,0,0,canvasHeight); g.addColorStop(0,'#082333'); g.addColorStop(1,'#021018'); ctx.fillStyle=g; ctx.fillRect(0,0,canvasWidth,canvasHeight);
+function clearBalls(){
+  balls.forEach(b => Composite.remove(world, b.body));
+  balls = [];
+  nextBallId = 1;
+}
 
-    // finish line
-    ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fillRect(0,finishY,canvasWidth,6);
+// ----- Leaderboard UI -----
+const leaderboardEl = document.getElementById('leaderboard');
+const activeCountEl = document.getElementById('activeCount');
+const roundInfoEl = document.getElementById('roundInfo');
+const timerEl = document.getElementById('timer');
+const modeLabelEl = document.getElementById('modeLabel');
 
-    // pegs
-    pegs.forEach(p=>{ ctx.beginPath(); ctx.fillStyle='rgba(200,220,255,0.06)'; ctx.arc(p.position.x,p.position.y,p.circleRadius,0,Math.PI*2); ctx.fill(); })
+function updateLeaderboard(){
+  // Rank by distance to finish (higher y is closer to finish)
+  const active = balls.filter(b => b.finishedAt === null);
+  const ranked = [...balls].sort((a,b) => {
+    const ay = a.body.position.y;
+    const by = b.body.position.y;
+    // finished ones should be at top by finish time
+    if (a.finishedAt !== null && b.finishedAt === null) return -1;
+    if (b.finishedAt !== null && a.finishedAt === null) return 1;
+    if (a.finishedAt !== null && b.finishedAt !== null) return a.finishedAt - b.finishedAt;
+    return by - ay;
+  });
+  leaderboardEl.innerHTML = '';
+  ranked.forEach((b, idx) => {
+    const row = document.createElement('div');
+    row.className = 'nameRow';
+    const dot = document.createElement('div');
+    dot.className = 'colorDot';
+    dot.style.background = b.color;
+    dot.textContent = b.letter;
+    const label = document.createElement('div');
+    label.className = 'rankLabel';
+    const status = b.finishedAt ? `Finished (#${b.finishedAtRank || idx+1})` : `In race`;
+    label.innerHTML = `<div style="font-weight:800">${b.name}</div><div class="small">${status}</div>`;
+    row.appendChild(dot);
+    row.appendChild(label);
+    leaderboardEl.appendChild(row);
+  });
+  activeCountEl.textContent = active.length;
+}
 
-    // balls
-    balls.forEach(b=>{
-      const pos = b.body.position; const r = b.radius;
-      // 3d-like radial gradient
-      const grad = ctx.createRadialGradient(pos.x - r*0.4, pos.y - r*0.6, r*0.1, pos.x, pos.y, r*1.1);
-      grad.addColorStop(0,'rgba(255,255,255,0.8)'); grad.addColorStop(0.18,'rgba(255,255,255,0.2)'); grad.addColorStop(0.6,'rgba(0,0,0,0.12)');
-      // base color
-      ctx.beginPath(); ctx.arc(pos.x,pos.y,r,0,Math.PI*2); ctx.fillStyle = b.player.color; ctx.fill();
-      ctx.fillStyle = grad; ctx.fill();
-      // rim / shadow
-      ctx.beginPath(); ctx.arc(pos.x,pos.y,r,0,Math.PI*2); ctx.strokeStyle='rgba(0,0,0,0.25)'; ctx.lineWidth=2; ctx.stroke();
+// ----- Finish detection -----
+let finishOrder = []; // array of ball ids in order they crossed
+Events.on(engine, 'afterUpdate', function(){
+  balls.forEach(b => {
+    if (b.finishedAt === null && b.body.position.y >= finishY - 10) {
+      b.finishedAt = performance.now();
+      finishOrder.push(b);
+      b.finishedAtRank = finishOrder.length;
+      // make ball static at finish area to avoid bouncing out
+      Body.setVelocity(b.body, { x:0, y:0 });
+      Body.setStatic(b.body, true);
+    }
+  });
+  updateLeaderboard();
+});
+
+// ----- Drawing letters on balls -----
+(function patchRender(){
+  const original = render.context;
+  // We'll draw letters after the engine renders
+  Events.on(render, 'afterRender', function(){
+    const ctx = render.context;
+    balls.forEach(b => {
+      const pos = b.body.position;
+      ctx.beginPath();
+      ctx.fillStyle = b.color;
+      ctx.arc(pos.x, pos.y, ballRadius, 0, Math.PI*2);
+      ctx.fill();
+      // outline
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+      ctx.stroke();
       // letter
-      ctx.fillStyle = '#021022'; ctx.font = `${r}px Inter, sans-serif`; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(b.player.letter, pos.x, pos.y+2);
-    })
-
-    // draw top start area
-    ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,0,canvasWidth, startY+20);
-    // draw finish flags
-    ctx.fillStyle='rgba(100,255,200,0.06)'; ctx.fillRect(0,finishY-30,canvasWidth,30);
-  }
-
-  // Rankings by distance to finish (smaller y -> further from finish)
-  function updateRanks(){ const list = players.filter(p=>p.body).map(p=>{
-      const pos = p.body.position; const dist = Math.max(0, finishY - pos.y); const perc = Math.max(0, Math.min(100, (1 - dist/(finishY-startY))*100)); return {p,dist,perc}
-    }); list.sort((a,b)=>a.dist - b.dist); // smaller dist = closer to finish
-    ranksDiv.innerHTML = '';
-    list.forEach((it,i)=>{
-      const el = document.createElement('div'); el.style.display='flex'; el.style.justifyContent='space-between'; el.style.alignItems='center'; el.style.marginBottom='6px'; el.innerHTML = `<div style="display:flex;gap:8px;align-items:center"><div class="ballBadge" style="background:${it.p.color};color:#021022">${it.p.letter}</div><div style="min-width:90px">${it.p.name}</div></div><div class="small">${Math.round(it.perc)}%</div>`;
-      ranksDiv.appendChild(el);
+      ctx.fillStyle = '#021';
+      ctx.font = `${ballRadius}px sans-serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(b.letter, pos.x, pos.y+1);
     });
+    // draw start/finish labels
+    ctx.fillStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillRect(0, finishY, render.options.width, 4);
+  });
+})();
+
+// ----- Controls and game flow -----
+const namesInput = document.getElementById('namesInput');
+const startBtn = document.getElementById('startBtn');
+const continueBtn = document.getElementById('continueBtn');
+const removeWinnerBtn = document.getElementById('removeWinnerBtn');
+const resetBtn = document.getElementById('resetBtn');
+const modeSelect = document.getElementById('modeSelect');
+
+let originalNames = [];
+let activeNames = [];
+let round = 0;
+let roundStartTime = null;
+let roundTimerInterval = null;
+let mode = 'remove'; // or 'elimination'
+let roundInProgress = false;
+
+function assignColorsToNames(names){
+  return names.map((n,i) => ({ name: n.trim(), color: pickColor(i) }));
+}
+
+function startRaceFromNames(namesArr){
+  // clear previous balls and finish order
+  clearBalls();
+  finishOrder = [];
+  round++;
+  roundStartTime = performance.now();
+  roundInProgress = true;
+  roundInfoEl.textContent = `Round ${round}`;
+  // create balls
+  namesArr.forEach((n,i) => {
+    const color = pickColor(i);
+    createBall(n, color);
+  });
+  // ensure pegs are present; if not, regenerate
+  updateLeaderboard();
+  startRoundTimer();
+}
+
+function startRoundTimer(){
+  if (roundTimerInterval) clearInterval(roundTimerInterval);
+  roundTimerInterval = setInterval(() => {
+    const elapsed = (performance.now() - roundStartTime)/1000;
+    timerEl.textContent = formatTime(elapsed);
+    // If round is taking too long, slightly increase gravity to finish within target
+    if (elapsed > 70 && engine.gravity.y < 1.6) engine.gravity.y += 0.02;
+    // If round is too short, reduce gravity for next rounds
+  }, 500);
+}
+
+function stopRoundTimer(){
+  if (roundTimerInterval) clearInterval(roundTimerInterval);
+  roundTimerInterval = null;
+  timerEl.textContent = '00:00';
+}
+
+function beginGame(){
+  // parse names
+  const raw = namesInput.value.split('\n').map(s => s.trim()).filter(Boolean);
+  if (raw.length < 1) {
+    alert('Please enter at least one name.');
+    return;
   }
+  originalNames = raw.slice();
+  activeNames = raw.slice();
+  round = 0;
+  mode = modeSelect.value;
+  modeLabelEl.textContent = mode === 'remove' ? 'Remove Winner' : 'Elimination';
+  // regenerate pegs for variety
+  Composite.remove(world, pegs);
+  pegs = generatePegs(22, 12);
+  Composite.add(world, pegs);
+  // reset gravity
+  engine.gravity.y = 1.05;
+  startRaceFromNames(activeNames);
+}
 
-  // Finish detection
-  Events.on(engine, 'collisionStart', function(event){ const pairs = event.pairs; pairs.forEach(pair=>{ const a=pair.bodyA, b=pair.bodyB; [a,b].forEach(body=>{ if(body.label==='finish'){ // other body finished
-          const other = body===a?b:a; if(other.label==='player'){ const pl = players.find(x=>x.id===other.plugin.playerId); if(pl && pl.finishedAt==null){ pl.finishedAt = Date.now(); finishOrder.push({player:pl, time:pl.finishedAt}); pl.rank = finishOrder.length; checkRoundFinish(); } }
-        } }) }) });
+startBtn.addEventListener('click', () => {
+  beginGame();
+});
 
-  function checkRoundFinish(){ if(modeSelect.value==='winner'){ // show first
-      if(finishOrder.length>0 && !document.getElementById('removeWinnerBtn').classList.contains('hidden')){ }
-      if(finishOrder.length>=1){ const first = finishOrder[0]; showWinner(first.player); }
-    } else if(modeSelect.value==='elimination'){
-      // elimination: when all players finished, eliminate last one
-      if(finishOrder.length === players.length){ // determine last
-        const last = finishOrder[finishOrder.length-1].player; eliminationOrder.push(last); announceElimination(last);
-        // remove last after short delay and restart with remaining players
-        setTimeout(()=>{ players = players.filter(p=>p.id!==last.id); finishOrder=[]; clearBodiesAndRespawn(); roundCount++; if(players.length>1){ if(document.getElementById('shuffleEachRound').checked) regenerateAndShuffle(); startRound(); } else { showFinalWinner(players[0] || last); } }, 1200);
+// Continue (start next round with current active names)
+continueBtn.addEventListener('click', () => {
+  if (activeNames.length <= 1) {
+    alert('Not enough players to continue.');
+    return;
+  }
+  // regenerate pegs and reset world positions of balls
+  Composite.remove(world, pegs);
+  pegs = generatePegs(22, 12);
+  Composite.add(world, pegs);
+  engine.gravity.y = 1.05;
+  startRaceFromNames(activeNames);
+});
+
+// Remove winner manually
+removeWinnerBtn.addEventListener('click', () => {
+  if (finishOrder.length === 0) {
+    alert('No winner yet. Wait until someone finishes.');
+    return;
+  }
+  const winner = finishOrder[0];
+  if (!winner) return;
+  // remove winner from activeNames
+  activeNames = activeNames.filter(n => n !== winner.name);
+  // remove winner ball from world
+  Composite.remove(world, winner.body);
+  balls = balls.filter(b => b !== winner);
+  finishOrder = finishOrder.slice(1);
+  updateLeaderboard();
+  if (activeNames.length <= 1) {
+    stopRoundTimer();
+    roundInProgress = false;
+    alert(`Winner removed. Final winner: ${activeNames[0] || 'None'}`);
+  } else {
+    // continue with remaining players
+    alert(`${winner.name} removed. ${activeNames.length} players remain.`);
+  }
+});
+
+// Reset everything
+resetBtn.addEventListener('click', () => {
+  if (!confirm('Reset the game and clear names?')) return;
+  clearBalls();
+  Composite.remove(world, pegs);
+  pegs = generatePegs(22, 12);
+  Composite.add(world, pegs);
+  namesInput.value = '';
+  originalNames = [];
+  activeNames = [];
+  round = 0;
+  finishOrder = [];
+  stopRoundTimer();
+  updateLeaderboard();
+});
+
+// Automatic elimination logic: when all balls finished, handle according to mode
+Events.on(engine, 'afterUpdate', function(){
+  if (!roundInProgress) return;
+  // if all balls finished
+  const unfinished = balls.filter(b => b.finishedAt === null);
+  if (unfinished.length === 0 && balls.length > 0) {
+    roundInProgress = false;
+    stopRoundTimer();
+    // finishOrder contains balls in order of crossing
+    // assign ranks
+    finishOrder.forEach((b, idx) => b.finishedAtRank = idx+1);
+    updateLeaderboard();
+    if (mode === 'remove') {
+      // do nothing automatic; user can press Remove Winner to continue
+      alert(`Round ${round} finished. Winner: ${finishOrder[0].name}. Press "Remove Winner" to remove and continue.`);
+    } else if (mode === 'elimination') {
+      // eliminate last finisher
+      const last = finishOrder[finishOrder.length - 1];
+      if (last) {
+        alert(`Round ${round} finished. Eliminated: ${last.name}`);
+        // remove from activeNames
+        activeNames = activeNames.filter(n => n !== last.name);
+      }
+      // if more than one remains, restart automatically after short delay
+      if (activeNames.length > 1) {
+        setTimeout(() => {
+          // regenerate pegs for next round
+          Composite.remove(world, pegs);
+          pegs = generatePegs(22, 12);
+          Composite.add(world, pegs);
+          engine.gravity.y = 1.05;
+          startRaceFromNames(activeNames);
+        }, 1200);
+      } else {
+        alert(`Final winner: ${activeNames[0] || 'None'}`);
       }
     }
   }
+});
 
-  function showWinner(player){ winnerOverlay.classList.remove('hidden'); winnerOverlay.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="font-size:22px;">Winner</div><div class="ballBadge" style="width:72px;height:72px;background:${player.color};font-size:36px;color:#021022">${player.letter}</div><div style="font-size:18px">${player.name}</div><div style="display:flex;gap:8px"><button id="owRemove">Remove Winner & Continue</button><button id="owKeep">Keep & Restart</button></div></div>`;
-    document.getElementById('owRemove').onclick = ()=>{ // remove from players and continue
-      winnerOverlay.classList.add('hidden'); players = players.filter(p=>p.id!==player.id); lastResult.innerText = `Removed winner: ${player.name}`; finishOrder=[]; clearBodiesAndRespawn(); startRound(); }
-    document.getElementById('owKeep').onclick = ()=>{ winnerOverlay.classList.add('hidden'); lastResult.innerText = `Kept winner: ${player.name}`; finishOrder=[]; clearBodiesAndRespawn(); startRound(); }
-  }
+// Keep canvas responsive on resize
+window.addEventListener('resize', () => {
+  const newW = canvasWrap.clientWidth;
+  const newH = canvasWrap.clientHeight;
+  render.canvas.width = newW;
+  render.canvas.height = newH;
+  render.options.width = newW;
+  render.options.height = newH;
+});
 
-  function announceElimination(player){ // show small overlay
-    winnerOverlay.classList.remove('hidden'); winnerOverlay.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="font-size:18px;color:#f97316">Eliminated</div><div class="ballBadge" style="width:64px;height:64px;background:${player.color};font-size:32px;color:#021022">${player.letter}</div><div style="font-size:16px">${player.name}</div></div>`;
-    setTimeout(()=>{ winnerOverlay.classList.add('hidden'); }, 1100);
-  }
-
-  function showFinalWinner(player){ winnerOverlay.classList.remove('hidden'); winnerOverlay.innerHTML = `<div style="display:flex;flex-direction:column;align-items:center;gap:10px"><div style="font-size:22px;">🏆 Tournament Winner</div><div class="ballBadge" style="width:96px;height:96px;background:${player.color};font-size:48px;color:#021022">${player.letter}</div><div style="font-size:20px">${player.name}</div></div>`; lastResult.innerText = `Final Winner: ${player.name}`; }
-
-  function clearBodiesAndRespawn(){ // remove only dynamic bodies
-    // remove player bodies
-    players.forEach(p=>{ if(p.body) World.remove(engine.world,p.body); p.body=null; p.finishedAt=null; p.rank=null; }); balls=[]; finishOrder=[];
-    spawnBalls();
-  }
-
-  function startRound(){ if(players.length<1) { alert('Add at least one player'); return; }
-    // reset world
-    clearWorld(); engine = Engine.create(); engine.world.gravity.y = parseFloat(gravityRange.value);
-    addBorders(); generatePegs(); spawnBalls(); running = true; finishOrder=[]; eliminationOrder=[]; roundCount++;
-
-    // Runner
-    if(runner) Runner.stop(runner);
-    runner = Runner.create(); Runner.run(runner, engine);
-
-    // animation loop
-    (function loop(){ if(!running) return; Engine.update(engine, 1000/60); drawScene(); updateRanks(); requestAnimationFrame(loop); })();
-    // ensure minimum ~60s per round by adjusting world height & friction if needed — we rely on large map & pegs
-  }
-
-  function stopRound(){ running=false; if(runner) Runner.stop(runner); }
-
-  // shuffle/regenerate maze
-  function regenerateAndShuffle(){ generatePegs(); }
-
-  // UI bindings
-  startBtn.onclick = ()=>{ if(usersAreDuplicate()){ // avoid visual identical ties — randomize slight colors and positions
-        // shuffle seed
-      }
-      if(document.getElementById('shuffleEachRound').checked){ regenerateAndShuffle(); }
-      startRound(); }
-  stopBtn.onclick = ()=>{ stopRound(); }
-  shuffleBtn.onclick = ()=>{ regenerateAndShuffle(); }
-  gravityRange.oninput = ()=>{ engine.world.gravity.y = parseFloat(gravityRange.value); }
-  timescaleRange.oninput = ()=>{ engine.timing.timeScale = parseFloat(timescaleRange.value); }
-
-  restartBtn.onclick = ()=>{ finishOrder=[]; eliminationOrder=[]; clearBodiesAndRespawn(); startRound(); }
-  removeWinnerBtn.onclick = ()=>{ if(finishOrder.length>0){ const w = finishOrder[0].player; players = players.filter(p=>p.id!==w.id); finishOrder=[]; clearBodiesAndRespawn(); startRound(); } }
-
-  exportBtn.onclick = ()=>{ const data = players.map(p=>p.name).join(', '); prompt('Players (copy):', data); }
-
-  bracketToggle.onchange = ()=>{ if(bracketToggle.checked){ bracketPanel.classList.remove('hidden'); updateBracket(); } else { bracketPanel.classList.add('hidden'); }}
-
-  function updateBracket(){ // simple bracket visualization
-    bracketArea.innerHTML=''; const names = players.map(p=>p.name); if(names.length===0){ bracketArea.innerHTML='<div class="small">No players</div>'; return;} let html=''; names.forEach((n,i)=>{ html += `<div style="padding:6px;border-bottom:1px solid rgba(255,255,255,0.03)">${i+1}. ${n}</div>` }); bracketArea.innerHTML = html; }
-
-  function usersAreDuplicate(){ // check for name+letter+color duplicates; if exact duplicates exist we'll nudge colors
-    const seen = {}; let dup=false; players.forEach(p=>{ const k = `${p.name}|${p.letter}`; if(seen[k]) dup=true; seen[k]=true; }); if(dup){ players.forEach(p=>{ p.color = pickColor(p.name + Math.random()); }); renderPlayers(); } return dup; }
-
-  // Ensure that ties are handled: if two finished within 60ms treat as tie and randomize order
-  function finalizeFinishOrderIfTies(){ if(finishOrder.length>1){ // sort by time, detect ties
-      finishOrder.sort((a,b)=>a.time-b.time);
-      for(let i=0;i<finishOrder.length-1;i++){
-        if(Math.abs(finishOrder[i].time - finishOrder[i+1].time) < 60){ // tie
-          // randomize the small block
-          const block = [finishOrder[i], finishOrder[i+1]]; if(Math.random()>0.5) { finishOrder[i]=block[1]; finishOrder[i+1]=block[0]; }
-        }
-      }
-    }
-  }
-
-  // initial setup
-  generatePegs(); addBorders(); renderPlayers(); drawScene();
-
-  // make scrollable canvas responsive to container height
-  window.addEventListener('resize', ()=>{ const h = document.getElementById('canvasWrap').clientHeight; canvasHeight = canvas.height = Math.max(1200, h*2); finishY = canvasHeight - 80; generatePegs(); drawScene(); });
-
-  // auto-run demo if no players
-  // helpful instructions for the user
-  </script>
+// initial UI update
+updateLeaderboard();
+</script>
 </body>
 </html>
