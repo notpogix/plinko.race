@@ -12,91 +12,320 @@
     --text:#e6eef6;
   }
   html,body{height:100%;margin:0;font-family:Inter,system-ui,Segoe UI,Roboto,Arial;}
-  body{background:linear-gradient(180deg,#04101a 0%, #071827 60%);color:var(--text);display:flex;gap:24px;padding:24px;align-items:stretch}
-  .sidebar{width:420px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;padding:24px;box-shadow:0 12px 40px rgba(2,6,23,0.6);display:flex;flex-direction:column}
-  .sidebar h3{margin:8px 0 16px 0;font-size:22px;color:var(--accent);font-weight:700}
-  .inputRow{display:flex;gap:12px;margin-bottom:18px}
-  .inputRow input{flex:1;padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.08);background:rgba(255,255,255,0.03);color:var(--text);outline:none;font-size:16px}
-  .inputRow input::placeholder{color:rgba(255,255,255,0.4)}
-  .controls{display:flex;gap:12px;margin-bottom:18px;flex-wrap:wrap}
-  button{padding:16px 20px;border-radius:12px;border:none;background:var(--accent);color:#022;cursor:pointer;font-weight:600;font-size:16px;transition:all 0.2s}
-  button:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(6,182,212,0.4)}
-  button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.12);color:var(--text)}
-  button.ghost:hover{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.2)}
-  .namesList{max-height:50vh;overflow:auto;padding:12px;border-radius:12px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.04)}
-  .nameItem{display:flex;align-items:center;gap:16px;padding:12px;border-radius:12px;margin:8px 0;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);transition:all 0.2s}
-  .nameItem:hover{background:rgba(255,255,255,0.04);transform:translateX(4px)}
-  .colorDot{width:28px;height:28px;border-radius:50%;box-shadow:0 4px 12px rgba(0,0,0,0.6) inset}
-  .main{flex:1;display:flex;flex-direction:column;gap:18px}
-  .canvasWrap{flex:1;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:18px;padding:18px;display:flex;flex-direction:column}
-  #gameCanvas{width:100%;height:100%;border-radius:16px;background:linear-gradient(180deg,#071827,#04101a);display:block;box-shadow:0 12px 40px rgba(2,6,23,0.6)}
-  .footer{display:flex;justify-content:space-between;align-items:center;padding:12px 18px;color:rgba(255,255,255,0.7);background:rgba(255,255,255,0.02);border-radius:12px;border:1px solid rgba(255,255,255,0.04);font-size:16px}
-  .modal{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);background:#071827;padding:28px;border-radius:18px;box-shadow:0 20px 60px rgba(2,6,23,0.9);min-width:520px;z-index:40}
-  .overlay{position:fixed;inset:0;background:rgba(2,6,23,0.75);z-index:30}
-  .modal h2{margin:0 0 12px 0;color:var(--accent);font-size:28px}
-  .modal p{margin:0 0 18px 0;font-size:16px}
-  .modal .opts{display:flex;gap:12px;justify-content:flex-end;flex-wrap:wrap}
-  .small{font-size:16px;color:rgba(255,255,255,0.7)}
+  body{
+    background:linear-gradient(180deg,#04101a 0%, #071827 60%);
+    color:var(--text);
+    display:flex;
+    gap:32px;
+    padding:32px;
+    align-items:stretch;
+  }
+  .sidebar{
+    width:480px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015));
+    border-radius:24px;
+    padding:28px;
+    box-shadow:0 20px 60px rgba(2,6,23,0.9);
+    display:flex;
+    flex-direction:column;
+  }
+  .sidebar h3{
+    margin:10px 0 18px 0;
+    font-size:26px;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .inputRow{
+    display:flex;
+    gap:14px;
+    margin-bottom:22px;
+  }
+  .inputRow input{
+    flex:1;
+    padding:18px 16px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,0.16);
+    background:rgba(2,6,23,0.65);
+    color:var(--text);
+    outline:none;
+    font-size:18px;
+  }
+  .inputRow input::placeholder{
+    color:rgba(255,255,255,0.4);
+  }
+  .controls{
+    display:flex;
+    gap:14px;
+    margin-bottom:22px;
+    flex-wrap:wrap;
+  }
+  button{
+    padding:18px 22px;
+    border-radius:14px;
+    border:none;
+    background:var(--accent);
+    color:#021018;
+    cursor:pointer;
+    font-weight:700;
+    font-size:18px;
+    letter-spacing:0.02em;
+    transition:all 0.18s;
+  }
+  button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 10px 30px rgba(6,182,212,0.45);
+  }
+  button.ghost{
+    background:transparent;
+    border:1px solid rgba(255,255,255,0.2);
+    color:var(--text);
+  }
+  button.ghost:hover{
+    background:rgba(255,255,255,0.08);
+    border-color:rgba(255,255,255,0.3);
+  }
+  .namesList{
+    max-height:52vh;
+    overflow:auto;
+    padding:14px;
+    border-radius:16px;
+    background:rgba(15,23,42,0.85);
+    border:1px solid rgba(148,163,184,0.35);
+  }
+  .nameItem{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    padding:12px 14px;
+    border-radius:14px;
+    margin:10px 0;
+    background:rgba(15,23,42,0.96);
+    border:1px solid rgba(148,163,184,0.4);
+    transition:all 0.16s;
+  }
+  .nameItem:hover{
+    background:rgba(30,64,175,0.35);
+    transform:translateX(4px);
+  }
+  .colorDot{
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    box-shadow:0 0 0 3px rgba(255,255,255,0.26) inset, 0 6px 18px rgba(0,0,0,0.8);
+  }
+  .main{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    gap:20px;
+    position:relative;
+  }
+  .canvasWrap{
+    flex:1;
+    background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.015));
+    border-radius:24px;
+    padding:20px;
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  #gameCanvas{
+    width:100%;
+    height:100%;
+    border-radius:20px;
+    background:linear-gradient(180deg,#071827,#020617);
+    display:block;
+    box-shadow:0 20px 60px rgba(2,6,23,0.95);
+  }
+  .footer{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:14px 20px;
+    color:rgba(226,232,240,0.9);
+    background:rgba(15,23,42,0.9);
+    border-radius:16px;
+    border:1px solid rgba(148,163,184,0.45);
+    font-size:18px;
+  }
+  .modal{
+    position:fixed;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    background:#020617;
+    padding:32px;
+    border-radius:24px;
+    box-shadow:0 26px 80px rgba(2,6,23,0.95);
+    min-width:560px;
+    z-index:40;
+    border:1px solid rgba(148,163,184,0.6);
+  }
+  .overlay{
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,0.82);
+    z-index:30;
+  }
+  .modal h2{
+    margin:0 0 14px 0;
+    color:var(--accent);
+    font-size:30px;
+  }
+  .modal p{
+    margin:0 0 20px 0;
+    font-size:18px;
+  }
+  .modal .opts{
+    display:flex;
+    gap:14px;
+    justify-content:flex-end;
+    flex-wrap:wrap;
+  }
+  .small{
+    font-size:17px;
+    color:rgba(203,213,225,0.9);
+  }
   .namesList::-webkit-scrollbar{width:12px}
-  .namesList::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.08);border-radius:8px}
-  .namesList::-webkit-scrollbar-track{background:rgba(255,255,255,0.02)}
+  .namesList::-webkit-scrollbar-thumb{
+    background:rgba(148,163,184,0.55);
+    border-radius:8px;
+  }
+  .namesList::-webkit-scrollbar-track{
+    background:rgba(15,23,42,0.6);
+  }
+
+  /* Live leaderboard panel */
+  .leaderboard{
+    position:absolute;
+    right:18px;
+    top:18px;
+    z-index:5;
+    background:rgba(15,23,42,0.94);
+    border-radius:16px;
+    padding:14px 16px;
+    border:1px solid rgba(148,163,184,0.6);
+    min-width:230px;
+    max-width:280px;
+    box-shadow:0 14px 40px rgba(15,23,42,0.9);
+    backdrop-filter:blur(8px);
+  }
+  .leaderboardTitle{
+    font-size:18px;
+    font-weight:700;
+    color:var(--accent);
+    margin-bottom:8px;
+  }
+  .leaderboardItem{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:4px 2px;
+    font-size:15px;
+  }
+  .leaderboardRank{
+    width:22px;
+    text-align:right;
+    font-weight:700;
+    color:rgba(226,232,240,0.9);
+  }
+  .leaderboardDot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    box-shadow:0 0 0 2px rgba(15,23,42,0.8);
+  }
+  .leaderboardName{
+    flex:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    color:rgba(226,232,240,0.96);
+  }
+  .leaderboardDist{
+    font-size:13px;
+    color:rgba(148,163,184,0.95);
+  }
+
   @media (max-width:1200px){
-    body{flex-direction:column;padding:18px;gap:18px}
-    .sidebar{width:100%;max-width:500px}
-    .controls{justify-content:center}
+    body{
+      flex-direction:column;
+      padding:20px;
+      gap:20px;
+    }
+    .sidebar{
+      width:100%;
+      max-width:600px;
+    }
+    .controls{
+      justify-content:center;
+    }
+    .leaderboard{
+      position:static;
+      margin-bottom:10px;
+      align-self:flex-end;
+    }
   }
 </style>
 </head>
 <body>
   <div class="sidebar">
-    <h3>🏁 Plinko Race</h3>
+    <h3>Plinko Race</h3>
 
     <div class="inputRow">
       <input id="nameInput" placeholder="Type participant name and press Enter..." />
-      <button id="addBtn">➕ Add</button>
+      <button id="addBtn">Add</button>
     </div>
 
     <div class="controls">
-      <button id="startBtn">🚀 Start Race</button>
-      <button id="pauseBtn" class="ghost">⏸️ Pause</button>
-      <button id="restartBtn" class="ghost">🔄 Restart</button>
+      <button id="startBtn">Start Race</button>
+      <button id="pauseBtn" class="ghost">Pause</button>
+      <button id="restartBtn" class="ghost">Restart</button>
     </div>
 
     <h3 style="margin-top:12px">Participants</h3>
     <div class="namesList" id="namesList"></div>
 
-    <div style="margin-top:18px">
-      <div class="small">Type a name and press Enter or click Add. Use Pause to freeze the simulation. Finish line clearly visible!</div>
+    <div style="margin-top:20px">
+      <div class="small">
+        Type a name and press Enter or click Add.<br>
+        Pause freezes the simulation. Finish line has a bold checker pattern at the bottom.
+      </div>
     </div>
   </div>
 
   <div class="main">
     <div class="canvasWrap">
+      <!-- Live leaderboard overlay -->
+      <div id="leaderboard" class="leaderboard" style="display:none">
+        <div class="leaderboardTitle">Live Leaderboard</div>
+        <div id="leaderboardBody"></div>
+      </div>
+
       <canvas id="gameCanvas"></canvas>
     </div>
     <div class="footer">
-      <div class="small">🎾 Balls: <span id="ballCount">0</span> • 🏆 Finished: <span id="finishedCount">0</span></div>
-      <div class="small">Finish line clearly visible at bottom • Desktop recommended for best experience</div>
+      <div class="small">Balls: <span id="ballCount">0</span> • Finished: <span id="finishedCount">0</span></div>
+      <div class="small">Finish zone at the bottom with checker stripe • Desktop recommended</div>
     </div>
   </div>
 
   <div id="overlay" class="overlay" style="display:none"></div>
   <div id="modal" class="modal" style="display:none">
-    <h2 id="modalTitle">🏆 Winner!</h2>
+    <h2 id="modalTitle">Winner</h2>
     <p id="modalBody"></p>
     <div class="opts">
-      <button id="restartAll">🔄 Restart All</button>
-      <button id="restartElimLast" class="ghost">⚰️ Eliminate Last</button>
-      <button id="restartElimWinner" class="ghost">👑 Eliminate Winner</button>
+      <button id="restartAll">Restart (all)</button>
+      <button id="restartElimLast" class="ghost">Restart (eliminate last)</button>
+      <button id="restartElimWinner" class="ghost">Restart (eliminate winner)</button>
     </div>
   </div>
 
 <script>
-/* Plinko — no bins, visible finish, text input for names, slow settling
-   - LARGER UI: +30-50% all sizes (sidebar 320→420px, padding 16→24px, fonts 16→22px, etc)
-   - Ball size +5%, peg spacing +5%, peg size +5% (from original)
-   - Finish line is a bold stripe + banner
-   - Balls settle naturally in finish zone; finishing requires low speed for several frames
+/* Larger UI + no bins, visible finish, text input for names, slow settling
+   - BIGGER UI everywhere
+   - Live leaderboard shows who is closest to the finish line
+   - Finish line is a bold black & white checker stripe (no emoji)
 */
 
 const SCALE_BALL = 1.05;
@@ -111,8 +340,8 @@ const PEG_SPACING_Y = 48 * SCALE_SPACING;
 const GRAVITY = 0.03;
 const FRICTION = 0.9994;
 const WALL_BOUNCE = 0.82;
-const FINISH_ZONE_HEIGHT = 100;
-const FINISH_LINE_THICK = 10;
+const FINISH_ZONE_HEIGHT = 110;
+const FINISH_LINE_THICK = 16;
 const SETTLE_VEL = 0.12;
 const SETTLE_FRAMES = 6;
 
@@ -137,11 +366,14 @@ const restartElimWinner = document.getElementById('restartElimWinner');
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d', { alpha: false });
 
+const leaderboardEl = document.getElementById('leaderboard');
+const leaderboardBodyEl = document.getElementById('leaderboardBody');
+
 let DPR = Math.max(1, window.devicePixelRatio || 1);
 function resizeCanvas(){
   const wrap = canvas.parentElement.getBoundingClientRect();
-  const width = Math.max(1100, wrap.width);
-  const height = Math.max(window.innerHeight - 180, 1000);
+  const width = Math.max(1200, wrap.width);
+  const height = Math.max(window.innerHeight - 220, 1100);
   canvas.style.width = width + 'px';
   canvas.style.height = height + 'px';
   canvas.width = Math.floor(width * DPR);
@@ -173,9 +405,12 @@ function renderParticipants(){
   participants.forEach((p,i)=>{
     const div = document.createElement('div');
     div.className = 'nameItem';
-    div.innerHTML = `<div class="colorDot" style="background:${p.color};box-shadow:0 0 0 2px rgba(255,255,255,0.2) inset, 0 4px 12px rgba(0,0,0,0.6)"></div>
-                     <div style="flex:1"><strong style="font-size:18px">${p.name}</strong><div class="small" style="margin-top:2px">#${i+1}</div></div>
-                     <button class="ghost" data-i="${i}" style="padding:10px 14px;font-size:14px">❌ Remove</button>`;
+    div.innerHTML = `<div class="colorDot" style="background:${p.color}"></div>
+                     <div style="flex:1">
+                       <strong style="font-size:20px">${p.name}</strong>
+                       <div class="small" style="margin-top:2px;font-size:14px;opacity:0.8">#${i+1}</div>
+                     </div>
+                     <button class="ghost" data-i="${i}" style="padding:10px 14px;font-size:15px">Remove</button>`;
     namesListEl.appendChild(div);
   });
   namesListEl.querySelectorAll('button').forEach(btn=>{
@@ -213,7 +448,7 @@ nameInput.addEventListener('keydown', e=>{
 pauseBtn.addEventListener('click', ()=>{
   if(!running) return;
   paused = !paused;
-  pauseBtn.textContent = paused ? '▶️ Resume' : '⏸️ Pause';
+  pauseBtn.textContent = paused ? 'Resume' : 'Pause';
   if(!paused) loop();
 });
 restartBtn.addEventListener('click', ()=>{
@@ -256,6 +491,7 @@ function resetGame(keepParticipants=false){
   buildMap();
   draw();
   finishedCountEl.textContent = '0';
+  leaderboardEl.style.display = 'none';
 }
 
 /* Spawn balls */
@@ -267,14 +503,14 @@ function spawnBalls(){
   const spacing = (spawnXEnd - spawnXStart) / Math.max(1, participants.length);
   participants.forEach((p, i)=>{
     if(!p.active) return;
-    const x = spawnXStart + spacing * (i + 0.5) + (Math.random()-0.5)*6;
-    const y = 30 + Math.random()*6;
+    const x = spawnXStart + spacing * (i + 0.5) + (Math.random()-0.5)*8;
+    const y = 40 + Math.random()*10;
     balls.push({
       id: i,
       name: p.name,
       color: p.color,
       x, y,
-      vx: (Math.random()-0.5)*0.25,
+      vx: (Math.random()-0.5)*0.28,
       vy: 0,
       r: BALL_RADIUS,
       finished: false,
@@ -294,18 +530,15 @@ function stepPhysics(){
   for(let b of balls){
     if(b.finished) continue;
 
-    // integrate
     b.vy += GRAVITY;
     b.vx *= FRICTION;
     b.vy *= FRICTION;
     b.x += b.vx;
     b.y += b.vy;
 
-    // walls
     if(b.x - b.r < 0){ b.x = b.r; b.vx = Math.abs(b.vx) * WALL_BOUNCE; }
     if(b.x + b.r > W){ b.x = W - b.r; b.vx = -Math.abs(b.vx) * WALL_BOUNCE; }
 
-    // peg collisions (AABB quick skip)
     for(let p of pegs){
       if(Math.abs(b.x - p.x) > (b.r + p.r + 6)) continue;
       if(Math.abs(b.y - p.y) > (b.r + p.r + 6)) continue;
@@ -327,16 +560,11 @@ function stepPhysics(){
       }
     }
 
-    // finish zone: allow bounce and settling; no bins
     if(b.y + b.r >= finishTop){
-      // keep ball above bottom edge
       if(b.y + b.r > H - 8) b.y = H - 8 - b.r;
-      // small bounce off bottom
       if(b.vy > 0) b.vy = -Math.abs(b.vy) * 0.35;
-      // horizontal damping
       b.vx *= 0.88;
 
-      // settle detection
       const speed = Math.hypot(b.vx, b.vy);
       if(speed < SETTLE_VEL){
         b.settleFrames = (b.settleFrames || 0) + 1;
@@ -348,7 +576,6 @@ function stepPhysics(){
         b.finishTime = performance.now() - startTime;
         finished.push({name: b.name, color: b.color, finishTime: b.finishTime});
         finishedCountEl.textContent = finished.length;
-        // visually place near where it settled (no bins)
         b.vx = 0;
         b.vy = 0;
         b.y = finishTop + (FINISH_ZONE_HEIGHT/2) - b.r + (Math.random()*6 - 3);
@@ -357,23 +584,61 @@ function stepPhysics(){
   }
 }
 
+/* Live leaderboard: sort by distance to finish line */
+function updateLeaderboard(){
+  if(!running || balls.length === 0){
+    leaderboardEl.style.display = 'none';
+    return;
+  }
+  const H = canvas.height / DPR;
+  const finishTop = H - FINISH_ZONE_HEIGHT;
+  const finishCenter = H - FINISH_ZONE_HEIGHT/2;
+
+  const activeBalls = balls.filter(b=>!b.finished);
+  const ranked = activeBalls
+    .map(b=>{
+      // distance from finish center (lower = closer)
+      const dist = Math.max(0, finishCenter - b.y);
+      return {name:b.name, color:b.color, dist:dist};
+    })
+    .sort((a,b)=>a.dist - b.dist)
+    .slice(0,8);
+
+  if(ranked.length === 0){
+    leaderboardEl.style.display = 'none';
+    return;
+  }
+
+  leaderboardEl.style.display = 'block';
+  leaderboardBodyEl.innerHTML = '';
+  ranked.forEach((item, idx)=>{
+    const row = document.createElement('div');
+    row.className = 'leaderboardItem';
+    row.innerHTML = `
+      <div class="leaderboardRank">${idx+1}.</div>
+      <div class="leaderboardDot" style="background:${item.color}"></div>
+      <div class="leaderboardName">${item.name}</div>
+      <div class="leaderboardDist">${Math.max(0, Math.round(item.dist))} px</div>
+    `;
+    leaderboardBodyEl.appendChild(row);
+  });
+}
+
 /* Draw */
 function draw(){
   const W = canvas.width / DPR;
   const H = canvas.height / DPR;
   ctx.clearRect(0,0,W,H);
 
-  // background
   const g = ctx.createLinearGradient(0,0,0,H);
-  g.addColorStop(0,'#071827');
-  g.addColorStop(1,'#04101a');
+  g.addColorStop(0,'#020617');
+  g.addColorStop(1,'#000000');
   ctx.fillStyle = g;
   ctx.fillRect(0,0,W,H);
 
-  // pegs (obstacles) - larger glow
-  ctx.shadowColor = 'rgba(6,182,212,0.3)';
+  ctx.shadowColor = 'rgba(148,163,184,0.6)';
   ctx.shadowBlur = 8;
-  ctx.fillStyle = 'rgba(255,255,255,0.12)';
+  ctx.fillStyle = 'rgba(148,163,184,0.4)';
   for(let p of pegs){
     ctx.beginPath();
     ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
@@ -381,73 +646,67 @@ function draw(){
   }
   ctx.shadowBlur = 0;
 
-  // finish zone and bold finish line
   const finishTop = H - FINISH_ZONE_HEIGHT;
-  // big stripe with glow
-  ctx.shadowColor = 'rgba(6,182,212,0.4)';
-  ctx.shadowBlur = 20;
-  ctx.fillStyle = 'rgba(6,182,212,0.18)';
+
+  // finish zone backdrop
+  ctx.fillStyle = 'rgba(15,23,42,0.9)';
   ctx.fillRect(0, finishTop, W, FINISH_ZONE_HEIGHT);
-  // thick finish line
-  ctx.fillStyle = 'rgba(6,182,212,1)';
-  ctx.fillRect(0, finishTop - FINISH_LINE_THICK, W, FINISH_LINE_THICK);
-  ctx.shadowBlur = 0;
-  
-  // banner text with glow
-  ctx.shadowColor = 'rgba(255,255,255,0.8)';
-  ctx.shadowBlur = 12;
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 28px Inter, Arial';
+
+  // checker finish stripe (black & white crosses)
+  const stripeY = finishTop - FINISH_LINE_THICK;
+  const tileSize = 20;
+  for(let x=0; x < W; x += tileSize){
+    ctx.fillStyle = ((Math.floor(x/tileSize) % 2) === 0) ? '#111827' : '#e5e7eb';
+    ctx.fillRect(x, stripeY, tileSize, FINISH_LINE_THICK);
+  }
+
+  // "FINISH" text above stripe (no emoji)
+  ctx.fillStyle = '#e5e7eb';
+  ctx.font = 'bold 26px Inter, Arial';
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('🎯 FINISH', W/2, finishTop - FINISH_LINE_THICK - 20);
-  ctx.shadowBlur = 0;
+  ctx.strokeStyle = 'rgba(15,23,42,0.9)';
+  ctx.lineWidth = 4;
+  ctx.strokeText('FINISH', W/2, stripeY - 22);
+  ctx.fillText('FINISH', W/2, stripeY - 22);
 
-  // balls (enhanced 3D shading)
+  // balls
   for(let b of balls){
-    // enhanced shadow
     ctx.beginPath();
-    ctx.ellipse(b.x+8, b.y+10, b.r*1.1, b.r*0.7, 0, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(0,0,0,0.45)';
+    ctx.ellipse(b.x+10, b.y+12, b.r*1.15, b.r*0.7, 0, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(0,0,0,0.55)';
     ctx.fill();
 
-    // main sphere with better lighting
-    const grad = ctx.createRadialGradient(b.x - b.r*0.4, b.y - b.r*0.7, b.r*0.1, b.x, b.y, b.r*1.3);
+    const grad = ctx.createRadialGradient(
+      b.x - b.r*0.4, b.y - b.r*0.7, b.r*0.15,
+      b.x, b.y, b.r*1.35
+    );
     grad.addColorStop(0, lighten(b.color, 25));
-    grad.addColorStop(0.5, lighten(b.color, 8));
+    grad.addColorStop(0.5, lighten(b.color, 10));
     grad.addColorStop(0.8, b.color);
-    grad.addColorStop(1, darken(b.color, 18));
+    grad.addColorStop(1, darken(b.color, 20));
     ctx.beginPath();
     ctx.arc(b.x, b.y, b.r, 0, Math.PI*2);
     ctx.fillStyle = grad;
     ctx.fill();
 
-    // specular highlight
-    ctx.shadowColor = 'rgba(255,255,255,0.6)';
-    ctx.shadowBlur = 8;
     ctx.beginPath();
-    ctx.arc(b.x - b.r*0.3, b.y - b.r*0.5, b.r*0.25, 0, Math.PI*2);
-    ctx.fillStyle = 'rgba(255,255,255,0.8)';
+    ctx.arc(b.x - b.r*0.3, b.y - b.r*0.55, b.r*0.28, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.fill();
-    ctx.shadowBlur = 0;
 
-    // name label with glow
-    ctx.shadowColor = 'rgba(0,0,0,0.8)';
-    ctx.shadowBlur = 4;
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.font = 'bold 16px Inter, Arial';
+    ctx.fillStyle = 'rgba(15,23,42,0.9)';
+    ctx.font = 'bold 18px Inter, Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(b.name, b.x, b.y - b.r - 14);
-    ctx.shadowBlur = 0;
+    ctx.fillText(b.name, b.x, b.y - b.r - 16);
   }
 
-  // finished list indicator
-  ctx.fillStyle = 'rgba(255,255,255,0.12)';
-  ctx.font = 'bold 18px Inter, Arial';
+  ctx.fillStyle = 'rgba(226,232,240,0.95)';
+  ctx.font = 'bold 20px Inter, Arial';
   ctx.textAlign = 'left';
   ctx.textBaseline = 'middle';
-  ctx.fillText(`🏆 Finished: ${finished.length}`, 20, 30);
+  ctx.fillText(`Finished: ${finished.length}`, 24, 34);
 }
 
 /* Color helpers */
@@ -472,6 +731,7 @@ function loop(){
   }
   stepPhysics();
   draw();
+  updateLeaderboard();
   if(finished.length === balls.length && balls.length > 0 && running){
     running = false;
     setTimeout(()=>showWinnerModal(), 350);
@@ -486,10 +746,14 @@ function showWinnerModal(){
   finished.sort((a,b)=>a.finishTime - b.finishTime);
   const winner = finished[0];
   const last = finished[finished.length-1];
-  modalTitle.textContent = `🏆 Winner: ${winner.name}`;
+  modalTitle.textContent = `Winner: ${winner.name}`;
   modalBody.innerHTML = `<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
-    <div style="width:48px;height:48px;border-radius:50%;background:${winner.color};box-shadow:0 8px 24px rgba(0,0,0,0.6), inset 0 2px 8px rgba(255,255,255,0.3)"></div>
-    <div><strong style="font-size:22px">${winner.name}</strong><div class="small" style="margin-top:4px">Finished in ${Math.round(winner.finishTime/1000)}s</div></div>
+    <div style="width:52px;height:52px;border-radius:50%;background:${winner.color};
+      box-shadow:0 10px 28px rgba(0,0,0,0.85), inset 0 2px 10px rgba(255,255,255,0.3)"></div>
+    <div>
+      <strong style="font-size:22px">${winner.name}</strong>
+      <div class="small" style="margin-top:4px;font-size:16px">Finished in ${Math.round(winner.finishTime)} ms</div>
+    </div>
   </div>
   <div class="small" style="font-size:18px">Last place: <strong>${last.name}</strong></div>`;
   overlay.style.display = 'block';
@@ -527,14 +791,14 @@ restartElimWinner.addEventListener('click', ()=>{
 /* Start */
 startBtn.addEventListener('click', ()=>{
   if(running) return;
-  if(participants.length === 0) return alert('Add at least one name first!');
+  if(participants.length === 0) return alert('Add at least one name.');
   participants = participants.map((p, idx)=>({name:p.name,color:colorForIndex(idx, Math.max(8,participants.length)),active:true}));
   renderParticipants();
   resetGame(true);
   spawnBalls();
   running = true;
   paused = false;
-  pauseBtn.textContent = '⏸️ Pause';
+  pauseBtn.textContent = 'Pause';
   startTime = performance.now();
   if(rafId) cancelAnimationFrame(rafId);
   loop();
@@ -542,11 +806,11 @@ startBtn.addEventListener('click', ()=>{
 
 /* initial */
 resetGame();
-ctx.fillStyle = 'rgba(255,255,255,0.12)';
-ctx.font = 'bold 24px Inter, Arial';
+ctx.fillStyle = 'rgba(226,232,240,0.85)';
+ctx.font = 'bold 26px Inter, Arial';
 ctx.textAlign = 'center';
 ctx.textBaseline = 'middle';
-ctx.fillText('👆 Type a name and press Enter, then Start Race', canvas.width/(2*DPR), canvas.height/(2*DPR));
+ctx.fillText('Type a name and press Enter, then Start Race', canvas.width/(2*DPR), canvas.height/(2*DPR));
 </script>
 </body>
 </html>
