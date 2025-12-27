@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Plinko Race — No Bins, Visible Finish</title>
+<title>Pogix's Plinko Race — No Bins, Visible Finish</title>
 <style>
   :root{
     --bg:#071827;
@@ -84,8 +84,9 @@
     background:rgba(255,255,255,0.08);
     border-color:rgba(255,255,255,0.3);
   }
+
   .namesList{
-    max-height:52vh;
+    max-height:30vh;
     overflow:auto;
     padding:14px;
     border-radius:16px;
@@ -113,6 +114,59 @@
     border-radius:50%;
     box-shadow:0 0 0 3px rgba(255,255,255,0.26) inset, 0 6px 18px rgba(0,0,0,0.8);
   }
+
+  /* Sidebar leaderboard under names, scrollable */
+  .sidebarLeaderboardWrap{
+    margin-top:18px;
+  }
+  .sidebarLeaderboardTitle{
+    margin:0 0 8px 0;
+    font-size:18px;
+    color:var(--accent);
+    font-weight:700;
+  }
+  .sidebarLeaderboard{
+    max-height:28vh;
+    overflow:auto;
+    padding:10px 12px;
+    border-radius:14px;
+    background:rgba(15,23,42,0.9);
+    border:1px solid rgba(148,163,184,0.5);
+  }
+
+  .leaderboardItem{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:4px 2px;
+    font-size:15px;
+  }
+  .leaderboardRank{
+    width:32px;
+    text-align:right;
+    font-weight:700;
+    color:rgba(226,232,240,0.9);
+  }
+  .leaderboardDot{
+    width:14px;
+    height:14px;
+    border-radius:50%;
+    box-shadow:0 0 0 2px rgba(15,23,42,0.8);
+  }
+  .leaderboardName{
+    flex:1;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    color:rgba(226,232,240,0.96);
+  }
+  .leaderboardDist{
+    font-size:13px;
+    color:rgba(148,163,184,0.95);
+    text-align:right;
+    min-width:70px;
+  }
+
   .main{
     flex:1;
     display:flex;
@@ -157,7 +211,8 @@
     padding:32px;
     border-radius:24px;
     box-shadow:0 26px 80px rgba(2,6,23,0.95);
-    min-width:560px;
+    min-width:620px;
+    max-width:720px;
     z-index:40;
     border:1px solid rgba(148,163,184,0.6);
   }
@@ -186,65 +241,16 @@
     font-size:17px;
     color:rgba(203,213,225,0.9);
   }
-  .namesList::-webkit-scrollbar{width:12px}
-  .namesList::-webkit-scrollbar-thumb{
+  .namesList::-webkit-scrollbar,
+  .sidebarLeaderboard::-webkit-scrollbar{width:12px}
+  .namesList::-webkit-scrollbar-thumb,
+  .sidebarLeaderboard::-webkit-scrollbar-thumb{
     background:rgba(148,163,184,0.55);
     border-radius:8px;
   }
-  .namesList::-webkit-scrollbar-track{
+  .namesList::-webkit-scrollbar-track,
+  .sidebarLeaderboard::-webkit-scrollbar-track{
     background:rgba(15,23,42,0.6);
-  }
-
-  /* Live leaderboard panel */
-  .leaderboard{
-    position:absolute;
-    right:18px;
-    top:18px;
-    z-index:5;
-    background:rgba(15,23,42,0.94);
-    border-radius:16px;
-    padding:14px 16px;
-    border:1px solid rgba(148,163,184,0.6);
-    min-width:230px;
-    max-width:280px;
-    box-shadow:0 14px 40px rgba(15,23,42,0.9);
-    backdrop-filter:blur(8px);
-  }
-  .leaderboardTitle{
-    font-size:18px;
-    font-weight:700;
-    color:var(--accent);
-    margin-bottom:8px;
-  }
-  .leaderboardItem{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:4px 2px;
-    font-size:15px;
-  }
-  .leaderboardRank{
-    width:22px;
-    text-align:right;
-    font-weight:700;
-    color:rgba(226,232,240,0.9);
-  }
-  .leaderboardDot{
-    width:14px;
-    height:14px;
-    border-radius:50%;
-    box-shadow:0 0 0 2px rgba(15,23,42,0.8);
-  }
-  .leaderboardName{
-    flex:1;
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-    color:rgba(226,232,240,0.96);
-  }
-  .leaderboardDist{
-    font-size:13px;
-    color:rgba(148,163,184,0.95);
   }
 
   @media (max-width:1200px){
@@ -260,17 +266,12 @@
     .controls{
       justify-content:center;
     }
-    .leaderboard{
-      position:static;
-      margin-bottom:10px;
-      align-self:flex-end;
-    }
   }
 </style>
 </head>
 <body>
   <div class="sidebar">
-    <h3>Plinko Race</h3>
+    <h3>Pogix's Plinko Race</h3>
 
     <div class="inputRow">
       <input id="nameInput" placeholder="Type participant name and press Enter..." />
@@ -286,48 +287,44 @@
     <h3 style="margin-top:12px">Participants</h3>
     <div class="namesList" id="namesList"></div>
 
-    <div style="margin-top:20px">
+    <!-- Sidebar leaderboard under names -->
+    <div class="sidebarLeaderboardWrap">
+      <h3 class="sidebarLeaderboardTitle">Leaderboard</h3>
+      <div class="sidebarLeaderboard" id="sidebarLeaderboard">
+        <div style="font-size:14px;color:rgba(148,163,184,0.95);">
+          Start a race to see live positions.
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px">
       <div class="small">
         Type a name and press Enter or click Add.<br>
-        Pause freezes the simulation. Finish line has a bold checker pattern at the bottom.
+        Pause freezes the simulation.
       </div>
     </div>
   </div>
 
   <div class="main">
     <div class="canvasWrap">
-      <!-- Live leaderboard overlay -->
-      <div id="leaderboard" class="leaderboard" style="display:none">
-        <div class="leaderboardTitle">Live Leaderboard</div>
-        <div id="leaderboardBody"></div>
-      </div>
-
       <canvas id="gameCanvas"></canvas>
     </div>
     <div class="footer">
       <div class="small">Balls: <span id="ballCount">0</span> • Finished: <span id="finishedCount">0</span></div>
-      <div class="small">Finish zone at the bottom with checker stripe • Desktop recommended</div>
     </div>
   </div>
 
   <div id="overlay" class="overlay" style="display:none"></div>
   <div id="modal" class="modal" style="display:none">
-    <h2 id="modalTitle">Winner</h2>
+    <h2 id="modalTitle">Leaderboard</h2>
     <p id="modalBody"></p>
     <div class="opts">
-      <button id="restartAll">Restart (all)</button>
-      <button id="restartElimLast" class="ghost">Restart (eliminate last)</button>
-      <button id="restartElimWinner" class="ghost">Restart (eliminate winner)</button>
+      <button id="restartAll">↻</button>
+      <button id="restartElimLast" class="ghost">↻ (Eliminate Last Place)</button>
     </div>
   </div>
 
 <script>
-/* Larger UI + no bins, visible finish, text input for names, slow settling
-   - BIGGER UI everywhere
-   - Live leaderboard shows who is closest to the finish line
-   - Finish line is a bold black & white checker stripe (no emoji)
-*/
-
 const SCALE_BALL = 1.05;
 const SCALE_PEG = 1.05;
 const SCALE_SPACING = 1.05;
@@ -337,15 +334,14 @@ const PEG_RADIUS = 6 * SCALE_PEG;
 const PEG_SPACING_X = 56 * SCALE_SPACING;
 const PEG_SPACING_Y = 48 * SCALE_SPACING;
 
-const GRAVITY = 0.03;
-const FRICTION = 0.9994;
-const WALL_BOUNCE = 0.82;
+const GRAVITY = 0.024;
+const FRICTION = 0.9992;
+const WALL_BOUNCE = 0.8;
 const FINISH_ZONE_HEIGHT = 110;
 const FINISH_LINE_THICK = 16;
 const SETTLE_VEL = 0.12;
 const SETTLE_FRAMES = 6;
 
-/* DOM */
 const nameInput = document.getElementById('nameInput');
 const addBtn = document.getElementById('addBtn');
 const startBtn = document.getElementById('startBtn');
@@ -361,13 +357,11 @@ const modalTitle = document.getElementById('modalTitle');
 const modalBody = document.getElementById('modalBody');
 const restartAll = document.getElementById('restartAll');
 const restartElimLast = document.getElementById('restartElimLast');
-const restartElimWinner = document.getElementById('restartElimWinner');
 
 const canvas = document.getElementById('gameCanvas');
 const ctx = canvas.getContext('2d', { alpha: false });
 
-const leaderboardEl = document.getElementById('leaderboard');
-const leaderboardBodyEl = document.getElementById('leaderboardBody');
+const sidebarLeaderboardEl = document.getElementById('sidebarLeaderboard');
 
 let DPR = Math.max(1, window.devicePixelRatio || 1);
 function resizeCanvas(){
@@ -383,7 +377,6 @@ function resizeCanvas(){
 window.addEventListener('resize', resizeCanvas);
 resizeCanvas();
 
-/* State */
 let participants = [];
 let balls = [];
 let pegs = [];
@@ -393,13 +386,11 @@ let paused = false;
 let startTime = 0;
 let rafId = null;
 
-/* Utilities */
 function colorForIndex(i, total){
   const hue = Math.round((i * 360 / Math.max(1,total)) % 360);
   return `hsl(${hue} 85% 55%)`;
 }
 
-/* Participants UI */
 function renderParticipants(){
   namesListEl.innerHTML = '';
   participants.forEach((p,i)=>{
@@ -419,12 +410,12 @@ function renderParticipants(){
       participants.splice(i,1);
       participants = participants.map((p, idx)=>({name:p.name, color:colorForIndex(idx, Math.max(8,participants.length)), active:true}));
       renderParticipants();
+      resetLeaderboardUI();
     });
   });
   ballCountEl.textContent = participants.length;
 }
 
-/* Add name via text box */
 function addNameFromInput(){
   const raw = nameInput.value || '';
   const name = raw.trim();
@@ -437,6 +428,7 @@ function addNameFromInput(){
   const idx = participants.length;
   participants.push({name, color: colorForIndex(idx, Math.max(8, participants.length)), active:true});
   renderParticipants();
+  resetLeaderboardUI();
   nameInput.value = '';
 }
 addBtn.addEventListener('click', addNameFromInput);
@@ -444,7 +436,6 @@ nameInput.addEventListener('keydown', e=>{
   if(e.key === 'Enter') addNameFromInput();
 });
 
-/* Controls */
 pauseBtn.addEventListener('click', ()=>{
   if(!running) return;
   paused = !paused;
@@ -455,9 +446,9 @@ restartBtn.addEventListener('click', ()=>{
   participants = [];
   renderParticipants();
   resetGame();
+  resetLeaderboardUI();
 });
 
-/* Map builder (no bins) */
 function buildMap(){
   pegs = [];
   const W = canvas.width / DPR;
@@ -480,7 +471,6 @@ function buildMap(){
   }
 }
 
-/* Reset */
 function resetGame(keepParticipants=false){
   balls = [];
   finished = [];
@@ -491,12 +481,11 @@ function resetGame(keepParticipants=false){
   buildMap();
   draw();
   finishedCountEl.textContent = '0';
-  leaderboardEl.style.display = 'none';
 }
 
-/* Spawn balls */
 function spawnBalls(){
   balls = [];
+  finished = [];
   const W = canvas.width / DPR;
   const spawnXStart = W * 0.12;
   const spawnXEnd = W * 0.88;
@@ -510,7 +499,7 @@ function spawnBalls(){
       name: p.name,
       color: p.color,
       x, y,
-      vx: (Math.random()-0.5)*0.28,
+      vx: (Math.random()-0.5)*0.22,
       vy: 0,
       r: BALL_RADIUS,
       finished: false,
@@ -521,7 +510,6 @@ function spawnBalls(){
   ballCountEl.textContent = balls.length;
 }
 
-/* Physics step (finish without bins) */
 function stepPhysics(){
   const W = canvas.width / DPR;
   const H = canvas.height / DPR;
@@ -561,9 +549,9 @@ function stepPhysics(){
     }
 
     if(b.y + b.r >= finishTop){
-      if(b.y + b.r > H - 8) b.y = H - 8 - b.r;
-      if(b.vy > 0) b.vy = -Math.abs(b.vy) * 0.35;
-      b.vx *= 0.88;
+      b.y = Math.min(b.y, H - 8 - b.r);
+      b.vx *= 0.9;
+      b.vy = 0;
 
       const speed = Math.hypot(b.vx, b.vy);
       if(speed < SETTLE_VEL){
@@ -584,43 +572,80 @@ function stepPhysics(){
   }
 }
 
-/* Live leaderboard: sort by distance to finish line */
-function updateLeaderboard(){
-  if(!running || balls.length === 0){
-    leaderboardEl.style.display = 'none';
-    return;
-  }
+/* Leaderboard items */
+function buildLeaderboardItems(){
   const H = canvas.height / DPR;
-  const finishTop = H - FINISH_ZONE_HEIGHT;
   const finishCenter = H - FINISH_ZONE_HEIGHT/2;
 
-  const activeBalls = balls.filter(b=>!b.finished);
-  const ranked = activeBalls
-    .map(b=>{
-      // distance from finish center (lower = closer)
+  const items = balls.map(b=>{
+    if(b.finished){
+      return {
+        name: b.name,
+        color: b.color,
+        finished: true,
+        finishTime: b.finishTime || Number.MAX_SAFE_INTEGER,
+        dist: 0
+      };
+    } else {
       const dist = Math.max(0, finishCenter - b.y);
-      return {name:b.name, color:b.color, dist:dist};
-    })
-    .sort((a,b)=>a.dist - b.dist)
-    .slice(0,8);
+      return {
+        name: b.name,
+        color: b.color,
+        finished: false,
+        finishTime: Number.MAX_SAFE_INTEGER,
+        dist: dist
+      };
+    }
+  });
 
-  if(ranked.length === 0){
-    leaderboardEl.style.display = 'none';
+  items.sort((a,b)=>{
+    if(a.finished && !b.finished) return -1;
+    if(!a.finished && b.finished) return 1;
+    if(a.finished && b.finished){
+      return a.finishTime - b.finishTime;
+    }
+    return a.dist - b.dist;
+  });
+
+  return items;
+}
+
+/* Reset leaderboard UI when no race */
+function resetLeaderboardUI(){
+  sidebarLeaderboardEl.innerHTML = `
+    <div style="font-size:14px;color:rgba(148,163,184,0.95);">
+      Start a race to see live positions.
+    </div>
+  `;
+}
+
+/* Live leaderboard (sidebar) */
+function updateLeaderboard(){
+  if(!running || balls.length === 0){
     return;
   }
 
-  leaderboardEl.style.display = 'block';
-  leaderboardBodyEl.innerHTML = '';
+  const items = buildLeaderboardItems();
+  const ranked = items;
+
+  sidebarLeaderboardEl.innerHTML = '';
   ranked.forEach((item, idx)=>{
     const row = document.createElement('div');
     row.className = 'leaderboardItem';
+    const rankDisplay =
+      idx === 0 ? '🥇' :
+      idx === 1 ? '🥈' :
+      idx === 2 ? '🥉' :
+      `${idx+1}.`;
     row.innerHTML = `
-      <div class="leaderboardRank">${idx+1}.</div>
+      <div class="leaderboardRank">${rankDisplay}</div>
       <div class="leaderboardDot" style="background:${item.color}"></div>
       <div class="leaderboardName">${item.name}</div>
-      <div class="leaderboardDist">${Math.max(0, Math.round(item.dist))} px</div>
+      <div class="leaderboardDist">
+        ${item.finished ? 'Finished' : ''}
+      </div>
     `;
-    leaderboardBodyEl.appendChild(row);
+    sidebarLeaderboardEl.appendChild(row);
   });
 }
 
@@ -648,11 +673,9 @@ function draw(){
 
   const finishTop = H - FINISH_ZONE_HEIGHT;
 
-  // finish zone backdrop
   ctx.fillStyle = 'rgba(15,23,42,0.9)';
   ctx.fillRect(0, finishTop, W, FINISH_ZONE_HEIGHT);
 
-  // checker finish stripe (black & white crosses)
   const stripeY = finishTop - FINISH_LINE_THICK;
   const tileSize = 20;
   for(let x=0; x < W; x += tileSize){
@@ -660,7 +683,6 @@ function draw(){
     ctx.fillRect(x, stripeY, tileSize, FINISH_LINE_THICK);
   }
 
-  // "FINISH" text above stripe (no emoji)
   ctx.fillStyle = '#e5e7eb';
   ctx.font = 'bold 26px Inter, Arial';
   ctx.textAlign = 'center';
@@ -670,7 +692,6 @@ function draw(){
   ctx.strokeText('FINISH', W/2, stripeY - 22);
   ctx.fillText('FINISH', W/2, stripeY - 22);
 
-  // balls
   for(let b of balls){
     ctx.beginPath();
     ctx.ellipse(b.x+10, b.y+12, b.r*1.15, b.r*0.7, 0, 0, Math.PI*2);
@@ -695,10 +716,13 @@ function draw(){
     ctx.fillStyle = 'rgba(255,255,255,0.85)';
     ctx.fill();
 
-    ctx.fillStyle = 'rgba(15,23,42,0.9)';
     ctx.font = 'bold 18px Inter, Arial';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = 'rgba(15,23,42,0.95)';
+    ctx.strokeText(b.name, b.x, b.y - b.r - 16);
+    ctx.fillStyle = b.color;
     ctx.fillText(b.name, b.x, b.y - b.r - 16);
   }
 
@@ -709,7 +733,6 @@ function draw(){
   ctx.fillText(`Finished: ${finished.length}`, 24, 34);
 }
 
-/* Color helpers */
 function lighten(hsl, amt){
   const m = hsl.match(/hsl\((\d+)\s+(\d+)%\s+(\d+)%\)/);
   if(!m) return hsl;
@@ -723,7 +746,6 @@ function darken(hsl, amt){
   return `hsl(${h} ${s}% ${l}%)`;
 }
 
-/* Loop */
 function loop(){
   if(paused){
     rafId = requestAnimationFrame(loop);
@@ -732,40 +754,65 @@ function loop(){
   stepPhysics();
   draw();
   updateLeaderboard();
-  if(finished.length === balls.length && balls.length > 0 && running){
-    running = false;
-    setTimeout(()=>showWinnerModal(), 350);
-  } else {
-    rafId = requestAnimationFrame(loop);
+
+  if(running){
+    const allFinished = balls.length > 0 && balls.every(b => b.finished);
+    if(allFinished){
+      running = false;
+      const items = buildLeaderboardItems();
+      setTimeout(()=>showEndModal(items), 350);
+      return;
+    }
   }
+
+  rafId = requestAnimationFrame(loop);
 }
 
-/* Winner modal */
-function showWinnerModal(){
-  if(finished.length === 0) return;
-  finished.sort((a,b)=>a.finishTime - b.finishTime);
-  const winner = finished[0];
-  const last = finished[finished.length-1];
-  modalTitle.textContent = `Winner: ${winner.name}`;
-  modalBody.innerHTML = `<div style="display:flex;align-items:center;gap:16px;margin-bottom:16px">
-    <div style="width:52px;height:52px;border-radius:50%;background:${winner.color};
-      box-shadow:0 10px 28px rgba(0,0,0,0.85), inset 0 2px 10px rgba(255,255,255,0.3)"></div>
-    <div>
-      <strong style="font-size:22px">${winner.name}</strong>
-      <div class="small" style="margin-top:4px;font-size:16px">Finished in ${Math.round(winner.finishTime)} ms</div>
+function showEndModal(items){
+  if(!items || items.length === 0) return;
+  const winner = items[0];
+  const last = items[items.length-1];
+
+  let listHtml = '';
+  items.forEach((item, idx)=>{
+    const icon =
+      idx === 0 ? '🥇' :
+      idx === 1 ? '🥈' :
+      idx === 2 ? '🥉' :
+      `${idx+1}.`;
+    listHtml += `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px;font-size:16px;">
+        <div style="width:34px;text-align:right;font-weight:700;">${icon}</div>
+        <div style="width:14px;height:14px;border-radius:50%;background:${item.color};box-shadow:0 0 0 2px rgba(15,23,42,0.9);"></div>
+        <div style="flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.name}</div>
+        <div style="font-size:13px;color:rgba(148,163,184,0.95);text-align:right;min-width:80px;">
+          ${item.finished ? 'Finished' : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  modalTitle.textContent = 'Leaderboard';
+  modalBody.innerHTML = `
+    <div style="margin-bottom:10px;font-size:17px;">
+      <strong>🥇 ${winner.name}</strong><span style="opacity:0.8;"> — First place</span><br>
+      <span style="opacity:0.8;">Last place: <strong>${last.name}</strong></span>
     </div>
-  </div>
-  <div class="small" style="font-size:18px">Last place: <strong>${last.name}</strong></div>`;
+    <div style="margin-top:10px;margin-bottom:4px;font-weight:600;font-size:16px;">Full Standings</div>
+    <div style="max-height:260px;overflow:auto;padding-right:4px;">
+      ${listHtml}
+    </div>
+  `;
   overlay.style.display = 'block';
   modal.style.display = 'block';
 }
 
-/* Modal actions */
 restartAll.addEventListener('click', ()=>{
   overlay.style.display = 'none';
   modal.style.display = 'none';
   participants = participants.map(p=>({name:p.name,color:p.color,active:true}));
   resetGame();
+  resetLeaderboardUI();
 });
 restartElimLast.addEventListener('click', ()=>{
   overlay.style.display = 'none';
@@ -776,19 +823,9 @@ restartElimLast.addEventListener('click', ()=>{
   participants = participants.filter(p=>p.name !== last.name);
   renderParticipants();
   resetGame();
-});
-restartElimWinner.addEventListener('click', ()=>{
-  overlay.style.display = 'none';
-  modal.style.display = 'none';
-  if(finished.length === 0) return;
-  finished.sort((a,b)=>a.finishTime - b.finishTime);
-  const winner = finished[0];
-  participants = participants.filter(p=>p.name !== winner.name);
-  renderParticipants();
-  resetGame();
+  resetLeaderboardUI();
 });
 
-/* Start */
 startBtn.addEventListener('click', ()=>{
   if(running) return;
   if(participants.length === 0) return alert('Add at least one name.');
@@ -804,8 +841,8 @@ startBtn.addEventListener('click', ()=>{
   loop();
 });
 
-/* initial */
 resetGame();
+resetLeaderboardUI();
 ctx.fillStyle = 'rgba(226,232,240,0.85)';
 ctx.font = 'bold 26px Inter, Arial';
 ctx.textAlign = 'center';
